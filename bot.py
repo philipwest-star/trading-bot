@@ -470,7 +470,7 @@ def format_signal_msg(market, res):
     ]
     return "\n".join(lines)
 
-def format_eval_msg(symbol, signal, entry, exit_p, ret, outcome, sl_hit, tp_hit, pnl, created_at):
+def format_eval_msg(symbol, signal, confidence, entry, exit_p, ret, outcome, sl_hit, tp_hit, pnl, created_at):
     emoji = "✅" if outcome=="KORREKT" else "❌" if outcome=="FALSCH" else "➖"
     arrow = "▲" if signal=="KAUFEN" else "▼"
     pnl_e = "📈" if pnl>0 else "📉"
@@ -484,6 +484,7 @@ def format_eval_msg(symbol, signal, entry, exit_p, ret, outcome, sl_hit, tp_hit,
         f"{emoji} <b>BACKTEST AUSWERTUNG — {symbol}</b>",
         f"",
         f"📊 Signal:      {arrow} {signal}",
+        f"🎯 Konfidenz:   {confidence}%",
         f"🏁 Ergebnis:    <b>{outcome}</b>",
         f"📊 Rendite:     <b>{ret:+.2f}%</b>",
         f"{pnl_e} Sim. P&L:   <b>{pnl:+.2f} USDT</b>",
@@ -700,7 +701,7 @@ def main():
             fid,symbol,signal,conf,entry,risk_p,created_at,eval_at = row
             result = evaluate_with_sl_tp(fid, symbol, signal, entry)
             if result:
-                msg = format_eval_msg(symbol, signal, entry,
+                msg = format_eval_msg(symbol, signal, conf, entry,
                     result["exit_price"], result["ret"], result["outcome"],
                     result["sl_hit"], result["tp_hit"], result["pnl"], created_at)
                 send_telegram(msg)
